@@ -16,15 +16,15 @@ variable "instance_type" {
 
 variable "desired_size" {
   type    = number
-  default = 4
+  default = 8
 }
 
 variable "min_size" {
   type    = number
-  default = 4
+  default = 8
 }
 
 variable "max_size" {
   type    = number
-  default = 6
+  default = 10
 }
