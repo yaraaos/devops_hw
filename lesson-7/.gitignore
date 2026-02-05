@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Local overrides
+*.tfvars
+*.tfvars.json
+
+# OS / misc
+.DS_Store
+
+# Helm
+charts/**/charts/
+charts/**/Chart.lock
