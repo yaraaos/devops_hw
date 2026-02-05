@@ -1,0 +1,15 @@
+applications:
+  - name: django-app
+    namespace: ${app_namespace}
+    project: default
+    source:
+      repoURL: ${app_repo_url}
+      path: ${app_path}
+      targetRevision: ${app_revision}
+    destination:
+      server: https://kubernetes.default.svc
+      namespace: ${app_namespace}
+    syncPolicy:
+      automated:
+        prune: true
+        selfHeal: true

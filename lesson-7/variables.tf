@@ -91,3 +91,31 @@ variable "max_size" {
   description = "Max worker nodes"
   default     = 6
 }
+
+variable "github_username" {
+  type        = string
+  description = "GitHub username used by Jenkins to push changes"
+}
+
+variable "github_pat" {
+  type        = string
+  description = "GitHub Personal Access Token (PAT) used by Jenkins"
+  sensitive   = true
+}
+
+variable "helm_repo_url" {
+  type        = string
+  description = "Git repo URL that contains the Helm chart (Jenkins will update values.yaml tag there)"
+}
+
+variable "helm_repo_path" {
+  type        = string
+  description = "Path inside helm repo where chart is located (example: django-chart)"
+  default     = "django-chart"
+}
+
+variable "helm_repo_revision" {
+  type        = string
+  description = "Branch/tag ArgoCD tracks (example: main)"
+  default     = "main"
+}

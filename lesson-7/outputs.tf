@@ -33,3 +33,19 @@ output "eks_cluster_name" {
 output "eks_cluster_endpoint" {
   value = module.eks.eks_cluster_endpoint
 }
+
+output "jenkins_url" {
+  value = module.jenkins.jenkins_url
+}
+
+output "jenkins_admin_password_cmd" {
+  value = module.jenkins.jenkins_admin_password_cmd
+}
+
+output "argocd_url" {
+  value = module.argo_cd.argocd_url
+}
+
+output "argocd_admin_password_cmd" {
+  value = module.argo_cd.argocd_admin_password_cmd
+}
