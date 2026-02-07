@@ -15,3 +15,10 @@ crash.*.log
 # Helm
 charts/**/charts/
 charts/**/Chart.lock
+
+django-app-goit/
+helm-charts-goit/
+terraform-jenkins/
+user-data.mime
+eks describe-nodegroup \
+*.mime
