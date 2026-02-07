@@ -45,40 +45,44 @@ module "eks" {
   max_size      = var.max_size
 }
 
-# --- Connect Terraform -> EKS (no kubeconfig needed) ---
+# --- Connect Terraform -> EKS ---
+
 data "aws_eks_cluster" "eks" {
   name = module.eks.eks_cluster_name
-  depends_on = [module.eks]
 }
 
 data "aws_eks_cluster_auth" "eks" {
   name = module.eks.eks_cluster_name
-  depends_on = [module.eks]
 }
 
 provider "kubernetes" {
-  host                   = data.aws_eks_cluster.eks.endpoint
-  cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-  token                  = data.aws_eks_cluster_auth.eks.token
+  host = data.aws_eks_cluster.eks.endpoint
+  cluster_ca_certificate = base64decode(
+    data.aws_eks_cluster.eks.certificate_authority[0].data
+  )
+  token = data.aws_eks_cluster_auth.eks.token
 }
 
 provider "helm" {
   kubernetes = {
-    host                   = data.aws_eks_cluster.eks.endpoint
-    cluster_ca_certificate = base64decode(data.aws_eks_cluster.eks.certificate_authority[0].data)
-    token                  = data.aws_eks_cluster_auth.eks.token
+    host = data.aws_eks_cluster.eks.endpoint
+    cluster_ca_certificate = base64decode(
+      data.aws_eks_cluster.eks.certificate_authority[0].data
+    )
+    token = data.aws_eks_cluster_auth.eks.token
   }
 }
 
+
 # --- Jenkins (Helm via Terraform) ---
 module "jenkins" {
-  source               = "./modules/jenkins"
-  cluster_name         = module.eks.eks_cluster_name
-  region               = var.aws_region
-  ecr_repository_url   = module.ecr.repository_url
+  source             = "./modules/jenkins"
+  cluster_name       = module.eks.eks_cluster_name
+  region             = var.aws_region
+  ecr_repository_url = module.ecr.repository_url
 
-  github_username      = var.github_username
-  github_pat           = var.github_pat
+  github_username = var.github_username
+  github_pat      = var.github_pat
 
   providers = {
     helm       = helm
@@ -92,9 +96,9 @@ module "argo_cd" {
   namespace     = "argocd"
   chart_version = "5.46.4"
 
-  app_repo_url  = var.helm_repo_url
-  app_path      = var.helm_repo_path
-  app_revision  = var.helm_repo_revision
+  app_repo_url = var.helm_repo_url
+  app_path     = var.helm_repo_path
+  app_revision = var.helm_repo_revision
 
   providers = {
     helm       = helm

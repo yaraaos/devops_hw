@@ -3,27 +3,22 @@ controller:
     username: admin
 
   serviceType: LoadBalancer
+  # (Cheaper alternative: ClusterIP + port-forward, but keeping your setup)
 
   resources:
     requests:
-      cpu: "250m"
-      memory: "512Mi"
+      cpu: "100m"
+      memory: "256Mi"
     limits:
-      cpu: "500m"
-      memory: "1Gi"
+      cpu: "300m"
+      memory: "512Mi"
 
   persistentVolume:
     enabled: true
     storageClass: "ebs-sc"
     size: 10Gi
 
-  installPlugins:
-    - kubernetes:latest
-    - workflow-aggregator:latest
-    - git:latest
-    - configuration-as-code:latest
-    - credentials-binding:latest
-    - github:latest
+  installPlugins: []
 
   JCasC:
     defaultConfig: true

@@ -8,13 +8,13 @@ variable "aws_region" {
 variable "state_bucket_name" {
   type        = string
   description = "Globally unique S3 bucket name for Terraform state"
-  default     = "terraform-state-lesson-7-yara-goit-02"
+  default     = "terraform-state-lesson-8-9-yara-goit-02"
 }
 
 variable "lock_table_name" {
   type        = string
   description = "DynamoDB table name for Terraform state locking"
-  default     = "terraform-locks-lesson-7"
+  default     = "terraform-locks-lesson-8-9"
 }
 
 # VPC
