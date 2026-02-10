@@ -105,3 +105,38 @@ module "argo_cd" {
     kubernetes = kubernetes
   }
 }
+
+# --- RDS ---
+module "rds" {
+  source = "./modules/rds"
+
+  name                = "myapp-db"
+  use_aurora          = false
+
+  # Standard RDS
+  engine                 = "postgres"
+  engine_version         = "17.2"
+  parameter_group_family_rds = "postgres17"
+
+  # Common
+  instance_class         = "db.t3.micro"
+  allocated_storage      = 20
+  db_name                = "myapp"
+  username               = "postgres"
+  password               = var.db_password
+
+  vpc_id                 = module.vpc.vpc_id
+  subnet_private_ids     = module.vpc.private_subnets
+  subnet_public_ids      = module.vpc.public_subnets
+  publicly_accessible    = false
+  multi_az               = false
+  backup_retention_period = 1
+
+  allowed_cidr_blocks    = [module.vpc.vpc_cidr]
+
+  tags = {
+    Environment = "dev"
+    Project     = "myapp"
+  }
+}
+

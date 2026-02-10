@@ -6,6 +6,11 @@ output "dynamodb_table_name" {
   value = module.s3_backend.dynamodb_table_name
 }
 
+output "db_endpoint" {
+  value       = module.rds.endpoint
+  description = "Database endpoint"
+}
+
 output "vpc_id" {
   value = module.vpc.vpc_id
 }

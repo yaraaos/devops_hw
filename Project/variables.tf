@@ -17,6 +17,12 @@ variable "lock_table_name" {
   default     = "terraform-locks-lesson-8-9"
 }
 
+variable "db_password" {
+  description = "DB master password"
+  type        = string
+  sensitive   = true
+}
+
 # VPC
 variable "vpc_name" {
   type        = string
