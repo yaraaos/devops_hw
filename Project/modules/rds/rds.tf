@@ -17,27 +17,27 @@ resource "aws_db_parameter_group" "standard" {
 }
 
 resource "aws_db_instance" "standard" {
-  count                   = var.use_aurora ? 0 : 1
-  identifier              = var.name
-  engine                  = var.engine
-  engine_version          = var.engine_version
-  instance_class          = var.instance_class
-  allocated_storage       = var.allocated_storage
+  count             = var.use_aurora ? 0 : 1
+  identifier        = var.name
+  engine            = var.engine
+  engine_version    = var.engine_version
+  instance_class    = var.instance_class
+  allocated_storage = var.allocated_storage
 
-  db_name                 = var.db_name
-  username                = var.username
-  password                = var.password
+  db_name  = var.db_name
+  username = var.username
+  password = var.password
 
-  db_subnet_group_name    = aws_db_subnet_group.default.name
-  vpc_security_group_ids  = [aws_security_group.rds.id]
-  publicly_accessible     = var.publicly_accessible
-  multi_az                = var.multi_az
+  db_subnet_group_name   = aws_db_subnet_group.default.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  publicly_accessible    = var.publicly_accessible
+  multi_az               = var.multi_az
 
   backup_retention_period = var.backup_retention_period
   parameter_group_name    = aws_db_parameter_group.standard[0].name
 
-  skip_final_snapshot     = true
-  deletion_protection     = false
+  skip_final_snapshot = true
+  deletion_protection = false
 
   tags = var.tags
 }

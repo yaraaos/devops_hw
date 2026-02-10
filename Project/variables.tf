@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "eu-central-1"
 }
 
+variable "use_aurora" {
+  description = "Whether to create an Aurora cluster instead of a single RDS instance"
+  type        = bool
+  default     = false
+}
+
 # Backend
 variable "state_bucket_name" {
   type        = string

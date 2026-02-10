@@ -134,8 +134,9 @@ variable "backup_retention_period" {
 variable "parameters" {
   description = "DB parameters to set in parameter group"
   type        = map(string)
-  default     = {
+  default = {
     max_connections            = "200"
+    log_statement              = "none"
     log_min_duration_statement = "500"
     work_mem                   = "4096"
   }

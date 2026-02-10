@@ -17,26 +17,26 @@ resource "aws_rds_cluster_parameter_group" "aurora" {
 }
 
 resource "aws_rds_cluster" "aurora" {
-  count                           = var.use_aurora ? 1 : 0
-  cluster_identifier              = "${var.name}-cluster"
+  count              = var.use_aurora ? 1 : 0
+  cluster_identifier = "${var.name}-cluster"
 
-  engine                          = var.engine_cluster
-  engine_version                  = var.engine_version_cluster
+  engine         = var.engine_cluster
+  engine_version = var.engine_version_cluster
 
-  master_username                 = var.username
-  master_password                 = var.password
-  database_name                   = var.db_name
+  master_username = var.username
+  master_password = var.password
+  database_name   = var.db_name
 
-  db_subnet_group_name            = aws_db_subnet_group.default.name
-  vpc_security_group_ids          = [aws_security_group.rds.id]
+  db_subnet_group_name   = aws_db_subnet_group.default.name
+  vpc_security_group_ids = [aws_security_group.rds.id]
 
-  backup_retention_period         = var.backup_retention_period
+  backup_retention_period = var.backup_retention_period
 
   db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.aurora[0].name
 
   # safer for homework cost control
-  skip_final_snapshot             = true
-  deletion_protection             = false
+  skip_final_snapshot = true
+  deletion_protection = false
 
   tags = var.tags
 }

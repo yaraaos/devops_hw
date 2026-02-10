@@ -10,7 +10,7 @@ output "security_group_id" {
 
 output "endpoint" {
   description = "DB endpoint (RDS endpoint or Aurora endpoint)"
-  value = var.use_aurora ? aws_rds_cluster.aurora[0].endpoint : aws_db_instance.standard[0].address
+  value       = var.use_aurora ? aws_rds_cluster.aurora[0].endpoint : aws_db_instance.standard[0].address
 }
 
 output "port" {
