@@ -1,24 +1,39 @@
+# =========================
 # Terraform
+# =========================
 .terraform/
 *.tfstate
 *.tfstate.*
+terraform.tfvars
+.terraform.lock.hcl
 crash.log
 crash.*.log
 
-# Local overrides
+# =========================
+# Terraform variable files
+# =========================
 *.tfvars
 *.tfvars.json
 
-# OS / misc
-.DS_Store
-
+# =========================
 # Helm
+# =========================
 charts/**/charts/
 charts/**/Chart.lock
 
+# =========================
+# Local artifacts / projects
+# =========================
 django-app-goit/
 helm-charts-goit/
 terraform-jenkins/
+aws/
+awscliv2.zip
 user-data.mime
-eks describe-nodegroup \
 *.mime
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+*.swp
