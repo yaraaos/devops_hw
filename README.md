@@ -1,192 +1,177 @@
-# CI/CD: Terraform + Jenkins + Helm + Argo CD (EKS)
+# 🚀 Terraform AWS RDS Модуль
 
-Цей проєкт реалізує повний CI/CD цикл для застосунку в Kubernetes (EKS):
-- Інфраструктура створюється через **Terraform**
-- **Jenkins** запускає pipeline з **Jenkinsfile**
-- Pipeline:
-  1) збирає Docker image з Dockerfile
-  2) пушить image в **AWS ECR**
-  3) оновлює `image.tag` (і `image.repository`) в `values.yaml` **Helm-репозиторію**
-  4) пушить зміни в `main`
-- **Argo CD** відслідковує Helm-репозиторій і автоматично деплоїть нову версію в кластер
+Універсальний Terraform-модуль для створення **AWS RDS бази даних** або **Aurora Cluster** через єдину гнучку конфігурацію.
+
+Модуль підтримує:
+
+✅ Звичайну RDS instance (PostgreSQL / MySQL)  
+✅ Aurora Cluster  
+керовані прапором `use_aurora`.
 
 ---
 
-## Репозиторії
+## ✨ Можливості модуля
 
-### Repo A (APP repo)
-- `django-app-goit` — містить `Dockerfile` + `Jenkinsfile`
-- Jenkins бере код звідси і будує образ
+- 🔁 **Перемикання режиму розгортання**
+  - `use_aurora = true` → створюється **Aurora Cluster + writer instance**
+  - `use_aurora = false` → створюється **одна aws_db_instance**
 
-### Repo B (HELM repo)
-- `helm-charts-goit` — містить Helm chart (наприклад `django-app/values.yaml`)
-- Jenkins оновлює тут `values.yaml` (repository/tag)
+- 🧱 **Спільні ресурси (створюються завжди)**
+  - DB Subnet Group
+  - Security Group
+  - Parameter Group
+
+- ⚙ **Повна параметризація**
+  - Engine та версія БД
+  - Клас інстансу
+  - Multi-AZ
+  - Користувацькі DB parameters
 
 ---
 
-## Архітектура CI/CD (схема)
+## 📦 Структура модуля
 
-```text
-          (push code)
-Dev  ───────────────► GitHub Repo A (App)
-                         │
-                         │ Jenkins Pipeline (Jenkinsfile)
-                         ▼
-                    Build image (Kaniko in K8s)
-                         │
-                         ▼
-                    Push to AWS ECR
-                         │
-                         ▼
-        Update Helm Repo B: values.yaml (image.tag/repository)
-                         │
-                         ▼
-                 GitHub Repo B (Helm charts)
-                         │
-                         ▼
-                 Argo CD watches Repo B
-                         │
-                         ▼
-            Sync/Deploy to EKS (new image tag)
-
+```text 
+modules/rds/
+├── rds.tf        # Створення звичайної RDS instance
+├── aurora.tf     # Створення Aurora Cluster + instances
+├── shared.tf     # Subnet Group, Security Group, Parameter Group
+├── variables.tf  # Вхідні змінні
+└── outputs.tf    # Виводи модуля
 ``` 
+
 ---
 
-## Вимоги
+## 🛠 Приклад використання
 
-- AWS account + EKS cluster
-- kubectl налаштований (доступ до EKS)
-- awscli налаштований
-- Terraform встановлений
-- Jenkins встановлений в кластері (через Helm з Terraform)
-- Argo CD встановлений (через Helm)
+```hcl 
+module "rds" {
+  source = "./modules/rds"
 
-  ---
+  use_aurora     = false
+  engine         = "postgres"
+  engine_version = "14"
 
-# 1) Як застосувати Terraform
+  instance_class = "db.t3.micro"
+  multi_az       = false
 
-У папці проєкту з Terraform (де main.tf)
+  db_name  = "appdb"
+  username = "dbadmin"
+  password = var.db_password
 
-### 1.1 Ініціалізація
-```terraform init```
+  subnet_ids = module.vpc.private_subnet_ids
+  vpc_id     = module.vpc.vpc_id
 
-### 1.2 Перевірка плану
-```terraform plan```
+  allowed_cidr_blocks = ["10.0.0.0/16"]
 
-### 1.3 Застосування
-```terraform apply -auto-approve```
+  parameters = {
+    max_connections = "200"
+    log_statement   = "none"
+    work_mem        = "4096"
+  }
+}
+``` 
 
-### 1.4 Перевірити ресурси в кластері
-```
-kubectl get nodes
-kubectl get ns
-kubectl get pods -A
-```
 ---
 
-## 2) Jenkins: як перевірити Job / Pipeline
-### 2.1 Отримати доступ до Jenkins UI
-### Перевірити namespace Jenkins (якщо інший — заміни)
-```
-kubectl get ns | grep jenkins
-```
+## 🔧 Вхідні змінні
 
-### Знайти сервіс Jenkins
-```
-kubectl -n jenkins get svc
-```
+| Змінна | Тип | Значення за замовчуванням | Опис |
+|--------|------|---------------------------|------|
+| `use_aurora` | `bool` | `false` | Перемикання між Aurora та звичайною RDS |
+| `engine` | `string` | `"postgres"` | Engine бази даних (`postgres`, `mysql`, …) |
+| `engine_version` | `string` | `"14"` | Версія engine |
+| `instance_class` | `string` | `"db.t3.micro"` | Клас інстансу |
+| `multi_az` | `bool` | `false` | Увімкнути Multi-AZ |
+| `db_name` | `string` | `"appdb"` | Початкова база даних |
+| `username` | `string` | `"dbadmin"` | Master username |
+| `password` | `string` | — | Master password (**sensitive**) |
+| `subnet_ids` | `list(string)` | — | Subnet IDs для DB Subnet Group |
+| `vpc_id` | `string` | — | VPC ID для Security Group |
+| `allowed_cidr_blocks` | `list(string)` | `["0.0.0.0/0"]` | Дозволені CIDR (тимчасовий дефолт) |
+| `parameters` | `map(string)` | `{}` | Параметри DB Parameter Group |
 
-### Port-forward (локально)
-```
-kubectl -n jenkins port-forward svc/jenkins 8080:8080
-```
+---
 
-Відкрити браузер:
-- http://localhost:8080
+## 🔄 Перемикання типу БД
 
-### Отримати admin password (якщо Helm chart створює secret)
-```
-kubectl -n jenkins get secret jenkins -o jsonpath='{.data.jenkins-admin-password}' | base64 -d; echo
-```
+### ▶ Звичайна RDS Instance
 
-### 2.2 Jenkins credentials (обовʼязково)
+```hcl 
+use_aurora = false
+``` 
 
-В Jenkins UI:
-**Manage Jenkins → Credentials → (global) → Add Credentials**
+**Створюється:**
 
-Створити:
-### AWS credentials (Secret text)
-- **ID:** ```aws-access-key-id```
-- **Secret:** ваш AWS Access Key ID
-- **ID:** ```aws-secret-access-key```
-- **Secret:** ваш AWS Secret Access Key
-- 
-### GitHub Token (для push у Helm repo)
-- **ID:** github-token
-- **Secret:** GitHub PAT (classic) з правами:
-  - repo (обов’язково)
-  - (опційно) workflow
+✅ `aws_db_instance`
 
-### 2.3 Запуск Pipeline
-Pipeline налаштований як:
-- **Pipeline script from SCM**
-- Repo: ```https://github.com/<YOU>/django-app-goit.git```
-- Branch: ```main```
-- Script Path: ```Jenkinsfile```
+---
 
-### Build Now
-Натиснути **Build Now** і дивитись **Console Output**
+### ▶ Aurora Cluster
 
-### 2.4 Як зрозуміти, що Jenkins job успішний
-В Console Output має бути:
-- Kaniko build **Succeeded**
-- Push в ECR **OK**
-- ```git clone helm repo``` **OK**
-- ```git commit``` **OK**
-- ```git push origin main``` **OK**
+```hcl 
+use_aurora = true
+``` 
 
-  ---
+**Створюється:**
 
-## 3) Як побачити результат в Argo CD
-### 3.1 Доступ до Argo CD UI
-```
-kubectl -n argocd get svc
-kubectl -n argocd port-forward svc/argo-cd-argocd-server 8081:443
-```
-Відкрити:
-- https://localhost:8081
+✅ `aws_rds_cluster`  
+✅ `aws_rds_cluster_instance` (writer)
 
-### Отримати пароль Argo CD
-```
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-```
+---
 
-Login:
-- user: admin
-- password: (команда вище)
+## ⚙ Зміна Engine бази даних
 
-### 3.2 Перевірити застосунок в Argo CD
-В UI:
-- Applications → ваш app (наприклад django-app)
-- Переконатись:
-  - Repo = Helm repo (```helm-charts-goit```)
-  - Path = chart path (наприклад ```django-app``` або ```charts/django-app```)
-  - Sync status = **Synced**
-  - Health = **Healthy**
- 
-    ---
+### PostgreSQL
 
-## 4) Як швидко перевірити результат деплою в кластері
-### Подивитися pods у namespace застосунку (якщо окремий namespace)
-```
-kubectl get pods -A | grep django
-```
-### Перевірити деплоймент
-```
-kubectl get deploy -A | grep django
-```
-### Перевірити, який image реально використовується
-```
-kubectl get deploy -n <NAMESPACE> <DEPLOYMENT_NAME> -o jsonpath='{.spec.template.spec.containers[0].image}{"\n"}'
-```
+```hcl 
+engine         = "postgres"
+engine_version = "14"
+``` 
 
+---
+
+### MySQL
+
+```hcl 
+engine         = "mysql"
+engine_version = "8.0"
+``` 
+
+---
+
+## 💪 Зміна класу інстансу
+
+```hcl 
+instance_class = "db.t3.small"
+``` 
+
+Приклади:
+
+- `db.t3.micro` → тестування / мінімальні витрати  
+- `db.t3.small` → невеликі навантаження  
+- `db.t3.medium` → більші навантаження  
+
+---
+
+
+
+## ✅ Перевірка 
+
+Модуль перевірено через:
+
+```bash 
+terraform plan -var="use_aurora=true"
+terraform plan -var="use_aurora=false"
+``` 
+
+Очікувана поведінка:
+
+- Aurora режим → у плані з’являється `aws_rds_cluster`
+- Standard режим → у плані з’являється `aws_db_instance`
+
+Без необхідності `terraform apply`.
+
+---
+
+👨‍💻 **Terraform DevOps Homework – Універсальний RDS Модуль**
