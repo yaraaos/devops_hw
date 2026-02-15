@@ -1,3 +1,5 @@
+replicaCount: 1
+
 image:
   repository: "369751621151.dkr.ecr.eu-central-1.amazonaws.com/lesson-7-ecr"
   tag: "latest"
@@ -5,18 +7,5 @@ image:
 
 service:
   type: LoadBalancer
-  port: 8000
-
-autoscaling:
-  enabled: true
-  minReplicas: 2
-  maxReplicas: 6
-  targetCPUUtilizationPercentage: 70
-
-config:
-  DJANGO_DEBUG: "False"
-  POSTGRES_HOST: "db"
-  POSTGRES_PORT: "5432"
-  POSTGRES_DB: "django_db"
-  POSTGRES_USER: "django_user"
-  POSTGRES_PASSWORD: "pass9764gd"
+  port: 80
+  targetPort: 8000
