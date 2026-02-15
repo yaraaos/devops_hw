@@ -1,177 +1,241 @@
-# 🚀 Terraform AWS RDS Модуль
+# 📘 Final DevOps Project
+---
 
-Універсальний Terraform-модуль для створення **AWS RDS бази даних** або **Aurora Cluster** через єдину гнучку конфігурацію.
+# 🚀 Опис проєкту
 
-Модуль підтримує:
+Цей проєкт демонструє побудову хмарної інфраструктури в **AWS** із використанням **Terraform (Infrastructure as Code)** та розгортання застосунку в **Kubernetes (EKS)**.
 
-✅ Звичайну RDS instance (PostgreSQL / MySQL)  
-✅ Aurora Cluster  
-керовані прапором `use_aurora`.
+Реалізовано:
+
+- Мережеву архітектуру (VPC)
+- Безпеку (IAM, Security Groups)
+- Kubernetes кластер (EKS)
+- Контейнерний реєстр (ECR)
+- Базу даних (RDS / Aurora)
+- CI/CD (Jenkins)
+- GitOps (Argo CD)
+- Моніторинг (Prometheus / Grafana)
+- Autoscaling
 
 ---
 
-## ✨ Можливості модуля
+# 🏗 Архітектура
 
-- 🔁 **Перемикання режиму розгортання**
-  - `use_aurora = true` → створюється **Aurora Cluster + writer instance**
-  - `use_aurora = false` → створюється **одна aws_db_instance**
+Інфраструктура включає:
 
-- 🧱 **Спільні ресурси (створюються завжди)**
-  - DB Subnet Group
-  - Security Group
-  - Parameter Group
-
-- ⚙ **Повна параметризація**
-  - Engine та версія БД
-  - Клас інстансу
-  - Multi-AZ
-  - Користувацькі DB parameters
-
----
-
-## 📦 Структура модуля
-
-```text 
-modules/rds/
-├── rds.tf        # Створення звичайної RDS instance
-├── aurora.tf     # Створення Aurora Cluster + instances
-├── shared.tf     # Subnet Group, Security Group, Parameter Group
-├── variables.tf  # Вхідні змінні
-└── outputs.tf    # Виводи модуля
-``` 
+✔ VPC  
+✔ Public / Private Subnets  
+✔ Internet Gateway  
+✔ Route Tables  
+✔ IAM Roles & Policies  
+✔ EKS Cluster  
+✔ Node Group (EC2)  
+✔ ECR Repository  
+✔ RDS / Aurora  
+✔ Monitoring Stack  
+✔ Argo CD  
 
 ---
 
-## 🛠 Приклад використання
+# ⚙️ Технології
 
-```hcl 
-module "rds" {
-  source = "./modules/rds"
-
-  use_aurora     = false
-  engine         = "postgres"
-  engine_version = "14"
-
-  instance_class = "db.t3.micro"
-  multi_az       = false
-
-  db_name  = "appdb"
-  username = "dbadmin"
-  password = var.db_password
-
-  subnet_ids = module.vpc.private_subnet_ids
-  vpc_id     = module.vpc.vpc_id
-
-  allowed_cidr_blocks = ["10.0.0.0/16"]
-
-  parameters = {
-    max_connections = "200"
-    log_statement   = "none"
-    work_mem        = "4096"
-  }
-}
-``` 
+- AWS  
+- Terraform  
+- Kubernetes (EKS)  
+- Helm  
+- Docker  
+- Jenkins  
+- Argo CD  
+- Prometheus  
+- Grafana  
 
 ---
 
-## 🔧 Вхідні змінні
+# 📂 Структура проєкту
 
-| Змінна | Тип | Значення за замовчуванням | Опис |
-|--------|------|---------------------------|------|
-| `use_aurora` | `bool` | `false` | Перемикання між Aurora та звичайною RDS |
-| `engine` | `string` | `"postgres"` | Engine бази даних (`postgres`, `mysql`, …) |
-| `engine_version` | `string` | `"14"` | Версія engine |
-| `instance_class` | `string` | `"db.t3.micro"` | Клас інстансу |
-| `multi_az` | `bool` | `false` | Увімкнути Multi-AZ |
-| `db_name` | `string` | `"appdb"` | Початкова база даних |
-| `username` | `string` | `"dbadmin"` | Master username |
-| `password` | `string` | — | Master password (**sensitive**) |
-| `subnet_ids` | `list(string)` | — | Subnet IDs для DB Subnet Group |
-| `vpc_id` | `string` | — | VPC ID для Security Group |
-| `allowed_cidr_blocks` | `list(string)` | `["0.0.0.0/0"]` | Дозволені CIDR (тимчасовий дефолт) |
-| `parameters` | `map(string)` | `{}` | Параметри DB Parameter Group |
-
----
-
-## 🔄 Перемикання типу БД
-
-### ▶ Звичайна RDS Instance
-
-```hcl 
-use_aurora = false
-``` 
-
-**Створюється:**
-
-✅ `aws_db_instance`
+^^^
+Project/
+├── main.tf
+├── backend.tf
+├── outputs.tf
+│
+├── modules/
+│   ├── s3-backend/
+│   ├── vpc/
+│   ├── ecr/
+│   ├── eks/
+│   ├── rds/
+│   ├── jenkins/
+│   └── argo_cd/
+│
+├── charts/
+│   └── django-app/
+│
+└── Django/
+    ├── app/
+    ├── Dockerfile
+    ├── Jenkinsfile
+    └── docker-compose.yaml
+^^^
 
 ---
 
-### ▶ Aurora Cluster
+# ☁️ Terraform Backend
 
-```hcl 
-use_aurora = true
-``` 
+Для збереження Terraform state:
 
-**Створюється:**
-
-✅ `aws_rds_cluster`  
-✅ `aws_rds_cluster_instance` (writer)
+- **S3 Bucket**
+- **DynamoDB (state locking)**
 
 ---
 
-## ⚙ Зміна Engine бази даних
+# 🔐 Безпека
 
-### PostgreSQL
+Налаштовано:
 
-```hcl 
-engine         = "postgres"
-engine_version = "14"
-``` 
-
----
-
-### MySQL
-
-```hcl 
-engine         = "mysql"
-engine_version = "8.0"
-``` 
+✔ VPC із сегментацією  
+✔ Security Groups  
+✔ IAM Roles  
+✔ IAM Policies  
+✔ Least Privilege Principle  
 
 ---
 
-## 💪 Зміна класу інстансу
+# ☸ Kubernetes (EKS)
 
-```hcl 
-instance_class = "db.t3.small"
-``` 
+Розгорнуто:
 
-Приклади:
+✔ EKS Cluster  
+✔ Managed Node Group  
+✔ AWS VPC CNI  
+✔ Metrics Server  
 
-- `db.t3.micro` → тестування / мінімальні витрати  
-- `db.t3.small` → невеликі навантаження  
-- `db.t3.medium` → більші навантаження  
+Перевірка стану:
 
----
-
-
-
-## ✅ Перевірка 
-
-Модуль перевірено через:
-
-```bash 
-terraform plan -var="use_aurora=true"
-terraform plan -var="use_aurora=false"
-``` 
-
-Очікувана поведінка:
-
-- Aurora режим → у плані з’являється `aws_rds_cluster`
-- Standard режим → у плані з’являється `aws_db_instance`
-
-Без необхідності `terraform apply`.
+^^^bash
+kubectl get nodes
+kubectl get pods -A
+^^^
 
 ---
 
-👨‍💻 **Terraform DevOps Homework – Універсальний RDS Модуль**
+# 🐳 Docker
+
+Застосунок контейнеризовано:
+
+✔ Dockerfile  
+✔ Docker Compose (локальне тестування)
+
+---
+
+# 📦 ECR
+
+Контейнерні образи зберігаються в:
+
+^^^
+<account>.dkr.ecr.eu-central-1.amazonaws.com/<repository>
+^^^
+
+---
+
+# 🔁 CI/CD (Jenkins)
+
+Pipeline:
+
+✔ Build Docker image  
+✔ Push до ECR  
+✔ Deploy у EKS  
+
+---
+
+# 🔄 GitOps (Argo CD)
+
+Argo CD забезпечує:
+
+✔ Декларативний деплой  
+✔ Синхронізацію Helm charts  
+✔ Контроль стану застосунків  
+
+---
+
+# 📊 Моніторинг
+
+Розгорнуто:
+
+✔ Prometheus  
+✔ Grafana  
+
+Grafana використовується для візуалізації метрик.
+
+---
+
+# 📈 Autoscaling
+
+Налаштовано:
+
+✔ Horizontal Pod Autoscaler (HPA)
+
+---
+
+# ⚠ Known Issues
+
+Через обмеження AWS Free Tier (`t3.micro`) можливі:
+
+- Затримки старту pod
+- Періодичні помилки AWS VPC CNI (`failed to assign IP address`)
+
+Це пов’язано з ресурсними обмеженнями інстансів.
+
+---
+
+# ✅ Результат
+
+✔ Побудовано AWS інфраструктуру через Terraform  
+✔ Використано модульну архітектуру  
+✔ Розгорнуто EKS кластер  
+✔ Налаштовано CI/CD  
+✔ Реалізовано GitOps  
+✔ Додано моніторинг  
+✔ Налаштовано автомасштабування  
+
+---
+
+# 📎 Відтворення проєкту
+
+## Terraform
+
+^^^bash
+terraform init
+terraform apply
+^^^
+
+---
+
+## Kubernetes
+
+^^^bash
+aws eks update-kubeconfig --region eu-central-1 --name <cluster-name>
+kubectl get nodes
+^^^
+
+---
+
+## Helm
+
+^^^bash
+helm upgrade --install django-app charts/django-app -n default
+^^^
+
+---
+
+# 🎯 Висновок
+
+Проєкт демонструє практичні навички:
+
+- Infrastructure as Code  
+- AWS Cloud  
+- Kubernetes  
+- CI/CD  
+- GitOps  
+- Monitoring  
+- Scaling  
