@@ -1,0 +1,16 @@
+alertmanager:
+  enabled: false
+
+pushgateway:
+  enabled: true
+
+server:
+  replicaCount: 1
+  persistentVolume:
+    enabled: false
+
+kube-state-metrics:
+  enabled: true
+
+prometheus-node-exporter:
+  enabled: true

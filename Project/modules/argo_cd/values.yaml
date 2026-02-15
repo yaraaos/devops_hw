@@ -1,5 +1,12 @@
+dex:
+  enabled: false
+
+notifications:
+  enabled: false
+
+applicationSet:
+  enabled: false
+
 server:
   service:
     type: LoadBalancer
-    port: 443
-
