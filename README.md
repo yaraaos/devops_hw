@@ -53,7 +53,7 @@
 
 # 📂 Структура проєкту
 
-^^^
+```
 Project/
 ├── main.tf
 ├── backend.tf
@@ -76,7 +76,7 @@ Project/
     ├── Dockerfile
     ├── Jenkinsfile
     └── docker-compose.yaml
-^^^
+```
 
 ---
 
@@ -112,10 +112,10 @@ Project/
 
 Перевірка стану:
 
-^^^bash
+```bash
 kubectl get nodes
 kubectl get pods -A
-^^^
+```
 
 ---
 
@@ -132,9 +132,9 @@ kubectl get pods -A
 
 Контейнерні образи зберігаються в:
 
-^^^
+```
 <account>.dkr.ecr.eu-central-1.amazonaws.com/<repository>
-^^^
+```
 
 ---
 
@@ -204,27 +204,27 @@ Grafana використовується для візуалізації мет�
 
 ## Terraform
 
-^^^bash
+```bash
 terraform init
 terraform apply
-^^^
+```
 
 ---
 
 ## Kubernetes
 
-^^^bash
+```bash
 aws eks update-kubeconfig --region eu-central-1 --name <cluster-name>
 kubectl get nodes
-^^^
+```
 
 ---
 
 ## Helm
 
-^^^bash
+```bash
 helm upgrade --install django-app charts/django-app -n default
-^^^
+```
 
 ---
 
