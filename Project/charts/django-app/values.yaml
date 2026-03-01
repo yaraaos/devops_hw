@@ -15,6 +15,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 2
   targetCPUUtilizationPercentage: 70
+
 resources:
   requests:
     cpu: "50m"
@@ -22,3 +23,10 @@ resources:
   limits:
     cpu: "200m"
     memory: "256Mi"
+
+db:
+  host: "myapp-db.cdi6cwse2wui.eu-central-1.rds.amazonaws.com"
+  port: "5432"
+  name: "myapp"
+  user: "postgres"
+  password: "finalpassword"
