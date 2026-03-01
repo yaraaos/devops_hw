@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: "369751621151.dkr.ecr.eu-central-1.amazonaws.com/lesson-7-ecr"
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 service:
   type: LoadBalancer
@@ -12,6 +12,13 @@ service:
 
 autoscaling:
   enabled: true
-  minReplicas: 2
-  maxReplicas: 5
+  minReplicas: 1
+  maxReplicas: 2
   targetCPUUtilizationPercentage: 70
+resources:
+  requests:
+    cpu: "50m"
+    memory: "128Mi"
+  limits:
+    cpu: "200m"
+    memory: "256Mi"
