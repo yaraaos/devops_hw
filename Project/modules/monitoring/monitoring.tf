@@ -10,6 +10,13 @@ resource "helm_release" "prometheus" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "prometheus"
   version    = var.prometheus_chart_version != "" ? var.prometheus_chart_version : null
+  
+  set = [
+    {
+      name  = "prometheus-node-exporter.enabled"
+      value = "false"
+    }
+  ]  
 
   values = [
     file("${path.module}/values-prometheus.yaml")
