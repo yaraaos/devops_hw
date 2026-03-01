@@ -37,3 +37,9 @@ user-data.mime
 # =========================
 .DS_Store
 *.swp
+*.tfplan
+*.tfplan.*
+.terraform/
+.terraform.lock.hcl
+crash.log
+crash.*.log
