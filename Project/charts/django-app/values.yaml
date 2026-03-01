@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: "369751621151.dkr.ecr.eu-central-1.amazonaws.com/lesson-7-ecr"
-  tag: "latest"
+  tag: "06796ac"
   pullPolicy: Always
 
 service:
