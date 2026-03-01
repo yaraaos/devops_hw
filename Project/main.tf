@@ -138,5 +138,6 @@ module "rds" {
     Environment = "dev"
     Project     = "myapp"
   }
+  eks_node_sg_id = module.eks.node_security_group_id
 }
 

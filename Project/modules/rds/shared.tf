@@ -12,14 +12,6 @@ resource "aws_security_group" "rds" {
   description = "Security group for RDS/Aurora ${var.name}"
   vpc_id      = var.vpc_id
 
-  ingress {
-    description = "DB access"
-    from_port   = var.db_port
-    to_port     = var.db_port
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
-  }
-
   egress {
     description = "All outbound"
     from_port   = 0
@@ -31,4 +23,14 @@ resource "aws_security_group" "rds" {
   tags = merge(var.tags, {
     Name = "${var.name}-sg"
   })
+}
+
+resource "aws_security_group_rule" "rds_from_eks_nodes" {
+  type                     = "ingress"
+  security_group_id        = aws_security_group.rds.id
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = var.eks_node_sg_id
+  description              = "Postgres from EKS nodes only"
 }

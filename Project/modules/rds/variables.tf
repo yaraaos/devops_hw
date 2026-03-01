@@ -99,6 +99,11 @@ variable "multi_az" {
   default     = false
 }
 
+variable "eks_node_sg_id" {
+  description = "Security group ID of EKS worker nodes"
+  type        = string
+}
+
 # ---------- Aurora ----------
 variable "engine_cluster" {
   description = "Aurora engine (aurora-postgresql or aurora-mysql)"

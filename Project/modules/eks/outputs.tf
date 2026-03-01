@@ -10,3 +10,7 @@ output "eks_node_role_arn" {
   value = aws_iam_role.nodes.arn
 }
 
+output "node_security_group_id" {
+  description = "Cluster shared security group used by nodes (cluster security group)"
+  value       = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
+}
