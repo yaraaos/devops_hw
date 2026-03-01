@@ -89,19 +89,19 @@ variable "instance_type" {
 variable "desired_size" {
   type        = number
   description = "Desired worker nodes"
-  default     = 4
+  default     = 2
 }
 
 variable "min_size" {
   type        = number
   description = "Min worker nodes"
-  default     = 4
+  default     = 1
 }
 
 variable "max_size" {
   type        = number
   description = "Max worker nodes"
-  default     = 6
+  default     = 4
 }
 
 variable "github_username" {
