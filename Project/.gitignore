@@ -4,16 +4,18 @@
 .terraform/
 *.tfstate
 *.tfstate.*
+*.tfplan
+*.tfplan.*
 terraform.tfvars
+*.tfvars
+*.tfvars.json
 .terraform.lock.hcl
 crash.log
 crash.*.log
-
-# =========================
-# Terraform variable files
-# =========================
-*.tfvars
-*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 
 # =========================
 # Helm
@@ -22,7 +24,26 @@ charts/**/charts/
 charts/**/Chart.lock
 
 # =========================
-# Local artifacts / projects
+# Python / Django
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.sqlite3
+db.sqlite3
+.env
+.env.*
+venv/
+.envrc
+
+# =========================
+# Docker
+# =========================
+*.tar
+
+# =========================
+# Local artifacts / old labs
 # =========================
 django-app-goit/
 helm-charts-goit/
@@ -33,13 +54,19 @@ user-data.mime
 *.mime
 
 # =========================
-# OS / Editor
+# IDE / Editor
+# =========================
+.vscode/
+.idea/
+*.swp
+
+# =========================
+# OS
 # =========================
 .DS_Store
-*.swp
-*.tfplan
-*.tfplan.*
-.terraform/
-.terraform.lock.hcl
-crash.log
-crash.*.log
+Thumbs.db
+
+# =========================
+# Kubernetes
+# =========================
+*.kubeconfig
