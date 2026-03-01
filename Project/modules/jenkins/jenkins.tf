@@ -46,6 +46,13 @@ resource "helm_release" "jenkins" {
     file("${path.module}/values.yaml")
   ]
 
+  set = [
+   {
+      name  = "persistence.enabled"
+      value = "false"
+    }
+  ]
+
   depends_on = [
     kubernetes_storage_class_v1.ebs_sc,
     kubernetes_secret_v1.github_token
