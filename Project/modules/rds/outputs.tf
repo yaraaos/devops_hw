@@ -22,3 +22,27 @@ output "engine_effective" {
   description = "Effective engine in use"
   value       = var.use_aurora ? var.engine_cluster : var.engine
 }
+output "db_endpoint" {
+  description = "RDS endpoint"
+  value       = module.rds.endpoint
+}
+
+output "db_port" {
+  description = "RDS port"
+  value       = module.rds.port
+}
+
+output "db_security_group_id" {
+  description = "Security group ID attached to RDS"
+  value       = module.rds.security_group_id
+}
+
+output "db_subnet_group_name" {
+  description = "Subnet group name for RDS"
+  value       = module.rds.subnet_group_name
+}
+
+output "db_engine_effective" {
+  description = "Effective DB engine (standard or aurora)"
+  value       = module.rds.engine_effective
+}
