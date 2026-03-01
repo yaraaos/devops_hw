@@ -36,6 +36,9 @@ if DB_HOST:
             "HOST": DB_HOST,
             "PORT": os.getenv("DB_PORT", "5432"),
             "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "60")),
+            "OPTIONS": {
+                "sslmode": os.getenv("DB_SSLMODE", "require"),
+            }
         }
     }
 else:
