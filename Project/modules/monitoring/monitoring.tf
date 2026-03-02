@@ -10,13 +10,25 @@ resource "helm_release" "prometheus" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "prometheus"
   version    = var.prometheus_chart_version != "" ? var.prometheus_chart_version : null
-  
+
   set = [
     {
       name  = "prometheus-node-exporter.enabled"
       value = "false"
+    },
+    {
+      name  = "server.persistentVolume.enabled"
+      value = "true"
+    },
+    {
+      name  = "server.persistentVolume.storageClass"
+      value = "ebs-sc-wffc"
+    },
+    {
+      name  = "server.persistentVolume.size"
+      value = "10Gi"
     }
-  ]  
+  ]
 
   values = [
     file("${path.module}/values-prometheus.yaml")
@@ -35,6 +47,21 @@ resource "helm_release" "grafana" {
   repository = "https://grafana.github.io/helm-charts"
   chart      = "grafana"
   version    = var.grafana_chart_version != "" ? var.grafana_chart_version : null
+
+  set = [
+    {
+      name  = "persistence.enabled"
+      value = "true"
+    },
+    {
+      name  = "persistence.storageClassName"
+      value = "ebs-sc-wffc"
+    },
+    {
+      name  = "persistence.size"
+      value = "5Gi"
+    }
+  ]
 
   values = [
     file("${path.module}/values-grafana.yaml")
