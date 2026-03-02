@@ -47,8 +47,10 @@ pipeline {
             -n ${NAMESPACE} \
             --set image.repository=${ECR_REGISTRY}/${ECR_REPO} \
             --set image.tag=${IMAGE_TAG}
+	    --atomic \
+            --timeout 10m
 
-          kubectl -n ${NAMESPACE} rollout status deployment/${RELEASE_NAME}-django --timeout=240s
+          kubectl -n ${NAMESPACE} rollout status deployment/${RELEASE_NAME}-django --timeout=10m
           kubectl -n ${NAMESPACE} get pods -o wide
         '''
       }
