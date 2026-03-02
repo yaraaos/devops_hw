@@ -1,4 +1,3 @@
-<pre>^^^markdown
 # 🚀 Фінальний DevOps Проєкт – AWS EKS Інфраструктура з CI/CD
 
 ---
@@ -90,7 +89,7 @@
 
 ### Структура директорій
 
-^^^
+```
 Project/
 │
 ├── main.tf
@@ -121,7 +120,7 @@ Project/
     ├── Dockerfile
     ├── Jenkinsfile
     └── docker-compose.yaml
-^^^
+```
 
 ---
 
@@ -129,19 +128,19 @@ Project/
 
 ### 1) Ініціалізація Terraform
 
-^^^bash
+```bash
 terraform init
 terraform validate
 terraform plan
-^^^
+```
 
 ---
 
 ### 2) Розгортання інфраструктури
 
-^^^bash
+```bash
 terraform apply
-^^^
+```
 
 Буде створено:
 
@@ -159,10 +158,10 @@ terraform apply
 
 ### Horizontal Pod Autoscaler
 
-^^^bash
+```bash
 kubectl -n default get hpa
 kubectl top pods -n default || true
-^^^
+```
 
 Очікується:
 
@@ -174,10 +173,10 @@ kubectl top pods -n default || true
 
 ### Cluster Autoscaler
 
-^^^bash
+```bash
 kubectl -n kube-system get deploy cluster-autoscaler || true
 kubectl -n kube-system logs deploy/cluster-autoscaler --tail=50 || true
-^^^
+```
 
 ---
 
@@ -196,10 +195,10 @@ kubectl -n kube-system logs deploy/cluster-autoscaler --tail=50 || true
 
 ### Перевірка підключення до БД
 
-^^^bash
+```bash
 POD=$(kubectl -n default get pod -l app=django-app-django -o jsonpath='{.items[0].metadata.name}')
 kubectl -n default exec -it "$POD" -- python manage.py shell -c "from django.db import connection; print(connection.vendor); print(connection.settings_dict.get('HOST'))"
-^^^
+```
 
 Очікується:
 
@@ -210,9 +209,9 @@ kubectl -n default exec -it "$POD" -- python manage.py shell -c "from django.db 
 
 ### Запуск міграцій
 
-^^^bash
+```bash
 kubectl -n default exec -it "$POD" -- python manage.py migrate
-^^^
+```
 
 ---
 
@@ -228,9 +227,9 @@ kubectl -n default exec -it "$POD" -- python manage.py migrate
 
 Перевірка:
 
-^^^bash
+```bash
 aws ec2 describe-security-groups --group-ids &lt;RDS_SG_ID&gt;
-^^^
+```
 
 ---
 
@@ -238,9 +237,9 @@ aws ec2 describe-security-groups --group-ids &lt;RDS_SG_ID&gt;
 
 ### Доступ до Jenkins
 
-^^^bash
+```bash
 kubectl -n jenkins port-forward svc/jenkins 8080:8080
-^^^
+```
 
 ---
 
@@ -255,10 +254,10 @@ kubectl -n jenkins port-forward svc/jenkins 8080:8080
 
 ## 🔁 Перевірка Argo CD
 
-^^^bash
+```bash
 kubectl -n argocd get application
 kubectl -n argocd describe application django-app
-^^^
+```
 
 Очікується:
 
@@ -272,9 +271,9 @@ kubectl -n argocd describe application django-app
 
 ### PVC
 
-^^^bash
+```bash
 kubectl get pvc -n monitoring
-^^^
+```
 
 Очікується:
 
@@ -285,9 +284,9 @@ kubectl get pvc -n monitoring
 
 ### Доступ до Grafana
 
-^^^bash
+```bash
 kubectl -n monitoring port-forward svc/grafana 3000:80
-^^^
+```
 
 ---
 
@@ -327,9 +326,9 @@ kubectl -n monitoring port-forward svc/grafana 3000:80
 
 Щоб уникнути зайвих витрат:
 
-^^^bash
+```bash
 terraform destroy
-^^^
+```
 
 ⚠️ Увага: буде видалено S3 backend та DynamoDB таблицю.
 
@@ -352,4 +351,3 @@ terraform destroy
 - Моніторинг з персистентністю: ✅
 - GitOps через Argo CD: ✅
 - Якісна документація: ✅
-^^^</pre>
