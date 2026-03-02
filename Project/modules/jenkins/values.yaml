@@ -18,13 +18,7 @@ controller:
     storageClass: "ebs-sc"
     size: 10Gi
 
-  installPlugins:
-    - kubernetes
-    - workflow-aggregator
-    - git
-    - credentials-binding
-    - pipeline-utility-steps
-    - blueocean
+  installPlugins: []
 
   JCasC:
     defaultConfig: true
