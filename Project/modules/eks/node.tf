@@ -124,3 +124,29 @@ resource "aws_eks_node_group" "general2" {
     version = tostring(aws_launch_template.maxpods.latest_version)
   }
 }
+
+resource "aws_eks_node_group" "monitoring_1a" {
+  cluster_name    = aws_eks_cluster.eks.name
+  node_group_name = "${var.cluster_name}-monitoring-1a"
+  node_role_arn   = aws_iam_role.nodes.arn
+
+  subnet_ids = [var.subnet_ids[0]] # ONLY if [0] is eu-central-1a for you
+
+  scaling_config {
+    desired_size = 1
+    min_size     = 1
+    max_size     = 3
+  }
+
+  instance_types = ["t3.micro"] # or whatever you're using
+  capacity_type  = "ON_DEMAND"
+
+  labels = {
+    role = "monitoring"
+    az   = "eu-central-1a"
+  }
+
+  update_config {
+    max_unavailable = 1
+  }
+}

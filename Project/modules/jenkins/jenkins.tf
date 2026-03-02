@@ -47,7 +47,7 @@ resource "helm_release" "jenkins" {
   ]
 
   set = [
-   {
+    {
       name  = "persistence.enabled"
       value = "false"
     }
