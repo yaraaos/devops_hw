@@ -1,4 +1,3 @@
-<pre>^^^markdown
 # 🚀 Final DevOps Project – AWS EKS Infrastructure with CI/CD
 
 ---
