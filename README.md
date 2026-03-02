@@ -1,83 +1,96 @@
-# 🚀 Final DevOps Project – AWS EKS Infrastructure with CI/CD
+<pre>^^^markdown
+# 🚀 Фінальний DevOps Проєкт – AWS EKS Інфраструктура з CI/CD
 
 ---
 
-## 📌 Project Overview
+## 📌 Опис проєкту
 
-This project demonstrates a production-style DevOps infrastructure deployed on **AWS** using:
+Даний проєкт демонструє побудову production-рівня DevOps-інфраструктури в **AWS** з використанням:
 
 - Terraform (Infrastructure as Code)
 - Amazon EKS (Kubernetes)
 - RDS PostgreSQL
 - Jenkins (CI/CD)
 - Argo CD (GitOps)
-- Prometheus & Grafana (Monitoring)
+- Prometheus та Grafana (Моніторинг)
 
-The application is a Dockerized Django app deployed via Helm and connected to RDS PostgreSQL.
+Застосунок — це Dockerized Django-додаток, який деплоїться через Helm та підключається до RDS PostgreSQL.
 
 ---
 
-## 🏗 Architecture Components
+## 🏗 Компоненти архітектури
 
-### 🌐 Networking (VPC)
+### 🌐 Мережева інфраструктура (VPC)
 
-- Custom VPC
-- Public & Private subnets (3 AZ)
+- Кастомна VPC
+- Публічні та приватні підмережі (3 Availability Zones)
 - Internet Gateway
-- Route tables
+- Таблиці маршрутизації
 - Security Groups
+
+---
 
 ### ☸ Kubernetes (EKS)
 
 - Managed NodeGroup
-- Cluster Autoscaler enabled
-- Metrics Server installed
-- AWS EBS CSI Driver configured
+- Налаштований Cluster Autoscaler
+- Встановлений Metrics Server
+- AWS EBS CSI Driver
 - Horizontal Pod Autoscaler (HPA)
-
-### 🐘 Database (RDS)
-
-- PostgreSQL engine
-- Security Group restricted to EKS NodeGroup
-- SSL enforced
-- Connected to Django via Kubernetes Secret
-
-### 📦 Container Registry (ECR)
-
-- Docker image repository
-- Integrated into Jenkins pipeline
-
-### 🔁 CI/CD (Jenkins)
-
-Pipeline includes:
-
-- Checkout
-- Unit Tests
-- Docker Build
-- Image Scan (Trivy)
-- Push to ECR
-- Helm Deploy
-- Automatic rollback on failure
-
-### 🔄 GitOps (Argo CD)
-
-- Auto Sync enabled
-- Self-healing enabled
-- Continuous reconciliation
-
-### 📊 Monitoring
-
-- Prometheus
-- Grafana
-- Persistent storage enabled (PVC Bound via EBS CSI)
 
 ---
 
-## 📂 Project Structure
+### 🐘 База даних (RDS)
 
-### Directory Layout
+- PostgreSQL
+- Security Group обмежений доступом лише з EKS NodeGroup
+- Примусове використання SSL
+- Підключення через Kubernetes Secret
 
-'''
+---
+
+### 📦 Контейнерний реєстр (ECR)
+
+- Репозиторій Docker-образів
+- Інтеграція з Jenkins пайплайном
+
+---
+
+### 🔁 CI/CD (Jenkins)
+
+Пайплайн включає:
+
+- Checkout коду
+- Unit тести
+- Збірку Docker-образу
+- Сканування образу (Trivy)
+- Push в ECR
+- Деплой через Helm
+- Автоматичний rollback при помилці
+
+---
+
+### 🔄 GitOps (Argo CD)
+
+- Увімкнений Auto Sync
+- Увімкнений Self-Healing
+- Безперервна синхронізація з Git
+
+---
+
+### 📊 Моніторинг
+
+- Prometheus
+- Grafana
+- Персистентне зберігання через PVC (EBS CSI)
+
+---
+
+## 📂 Структура проєкту
+
+### Структура директорій
+
+^^^
 Project/
 │
 ├── main.tf
@@ -108,27 +121,29 @@ Project/
     ├── Dockerfile
     ├── Jenkinsfile
     └── docker-compose.yaml
-'''
+^^^
 
 ---
 
-## ⚙️ Infrastructure Deployment
+## ⚙️ Розгортання інфраструктури
 
-### 1) Initialize Terraform
+### 1) Ініціалізація Terraform
 
-'''bash
+^^^bash
 terraform init
 terraform validate
 terraform plan
-'''
+^^^
 
-### 2) Apply Infrastructure
+---
 
-'''bash
+### 2) Розгортання інфраструктури
+
+^^^bash
 terraform apply
-'''
+^^^
 
-This provisions:
+Буде створено:
 
 - VPC
 - EKS
@@ -136,37 +151,39 @@ This provisions:
 - ECR
 - Jenkins
 - Argo CD
-- Monitoring stack
+- Стек моніторингу
 
 ---
 
-## 🔁 Autoscaling Verification
+## 🔁 Перевірка автомасштабування
 
 ### Horizontal Pod Autoscaler
 
-'''bash
+^^^bash
 kubectl -n default get hpa
 kubectl top pods -n default || true
-'''
+^^^
 
-Expected:
+Очікується:
 
-- HPA exists
-- Metrics are available
-- CPU-based scaling is configured
-
-### Cluster Autoscaler
-
-'''bash
-kubectl -n kube-system get deploy cluster-autoscaler || true
-kubectl -n kube-system logs deploy/cluster-autoscaler --tail=50 || true
-'''
+- HPA створений
+- Метрики доступні
+- Масштабування за CPU налаштоване
 
 ---
 
-## 🐘 Django + PostgreSQL Integration
+### Cluster Autoscaler
 
-### Environment Variables (Kubernetes Secret)
+^^^bash
+kubectl -n kube-system get deploy cluster-autoscaler || true
+kubectl -n kube-system logs deploy/cluster-autoscaler --tail=50 || true
+^^^
+
+---
+
+## 🐘 Підключення Django до PostgreSQL
+
+### Змінні середовища (Kubernetes Secret)
 
 - DB_HOST
 - DB_NAME
@@ -175,156 +192,164 @@ kubectl -n kube-system logs deploy/cluster-autoscaler --tail=50 || true
 - DB_PORT
 - DB_SSLMODE=require
 
-### Verify DB Connection
+---
 
-'''bash
+### Перевірка підключення до БД
+
+^^^bash
 POD=$(kubectl -n default get pod -l app=django-app-django -o jsonpath='{.items[0].metadata.name}')
 kubectl -n default exec -it "$POD" -- python manage.py shell -c "from django.db import connection; print(connection.vendor); print(connection.settings_dict.get('HOST'))"
-'''
+^^^
 
-Expected:
+Очікується:
 
-- `postgresql` / `postgres` vendor
-- Host = RDS endpoint
+- vendor = postgresql
+- host = endpoint RDS
 
-### Run Migrations
+---
 
-'''bash
+### Запуск міграцій
+
+^^^bash
 kubectl -n default exec -it "$POD" -- python manage.py migrate
-'''
+^^^
 
 ---
 
-## 🔐 Security Configuration
+## 🔐 Налаштування безпеки
 
-### RDS Security Group Rules
+### Security Group для RDS
 
-Inbound access:
+Вхідні правила:
 
-- Port 5432
-- Source: EKS NodeGroup Security Group only
-- No public `0.0.0.0/0` access
+- Порт 5432
+- Джерело: Security Group EKS NodeGroup
+- Заборонено 0.0.0.0/0
 
-Verify:
+Перевірка:
 
-'''bash
+^^^bash
 aws ec2 describe-security-groups --group-ids &lt;RDS_SG_ID&gt;
-'''
+^^^
 
 ---
 
-## 🔄 CI/CD Pipeline
+## 🔄 CI/CD
 
-### Access Jenkins
+### Доступ до Jenkins
 
-'''bash
+^^^bash
 kubectl -n jenkins port-forward svc/jenkins 8080:8080
-'''
-
-### Pipeline Features
-
-- Automated Docker build
-- Image scanning (Trivy)
-- Helm deployment with `--atomic`
-- Rollback on failure (Helm atomic rollback)
+^^^
 
 ---
 
-## 🔁 Argo CD Verification
+### Можливості пайплайну
 
-'''bash
+- Автоматична збірка Docker
+- Сканування образів
+- Helm-деплой з `--atomic`
+- Автоматичний rollback
+
+---
+
+## 🔁 Перевірка Argo CD
+
+^^^bash
 kubectl -n argocd get application
 kubectl -n argocd describe application django-app
-'''
+^^^
 
-Expected:
+Очікується:
 
-- Synced status
-- Automated sync enabled
-- SelfHeal enabled
+- Статус Synced
+- Увімкнений Auto Sync
+- Увімкнений SelfHeal
 
 ---
 
-## 📊 Monitoring Verification
+## 📊 Перевірка моніторингу
 
-### Check PVC
+### PVC
 
-'''bash
+^^^bash
 kubectl get pvc -n monitoring
-'''
+^^^
 
-Expected:
+Очікується:
 
-- `grafana` = Bound
-- `prometheus-server` = Bound
+- grafana — Bound
+- prometheus-server — Bound
 
-### Access Grafana
+---
 
-'''bash
+### Доступ до Grafana
+
+^^^bash
 kubectl -n monitoring port-forward svc/grafana 3000:80
-'''
+^^^
 
 ---
 
 ## 💾 Terraform Backend
 
-Remote state is stored in:
+Стан Terraform зберігається в:
 
 - S3 bucket
-- DynamoDB locking table
+- DynamoDB таблиці блокування
 
-This ensures:
+Забезпечує:
 
-- State consistency
-- Safe concurrent execution
-- Reliability
-
----
-
-## ⚠️ AWS Free Tier Limitations
-
-During development, cluster instability occurred due to:
-
-- low resources on small instances (e.g., `t3.micro`)
-- pod density limits (`maxPods`)
-- AWS VPC CNI IP allocation pressure
-
-Despite this:
-
-- Autoscaling was implemented
-- Metrics Server was running
-- Monitoring persistence was enabled
-- Core services (EKS/RDS/ECR/ArgoCD/Jenkins/Monitoring) were deployed and validated
+- Консистентність state
+- Захист від паралельного виконання
+- Надійність інфраструктури
 
 ---
 
-## 🧹 Destroy Infrastructure
+## ⚠️ Обмеження AWS Free Tier
 
-To avoid unexpected AWS charges:
+Під час розробки виникали нестабільності через:
 
-'''bash
+- Обмежені ресурси t3.micro
+- Невеликий обсяг пам’яті
+- Навантаження на AWS VPC CNI
+
+Незважаючи на це:
+
+- Автомасштабування налаштоване
+- Metrics Server працює
+- Персистентність моніторингу реалізована
+- Основні сервіси успішно розгорнуті
+
+---
+
+## 🧹 Видалення інфраструктури
+
+Щоб уникнути зайвих витрат:
+
+^^^bash
 terraform destroy
-'''
+^^^
 
-⚠️ Note: Destroying infrastructure removes the S3 backend and DynamoDB locking table.
+⚠️ Увага: буде видалено S3 backend та DynamoDB таблицю.
 
-If redeploying:
+Для повторного запуску:
 
-1. Recreate backend module first
-2. Run `terraform init`
-3. Apply remaining modules
+1. Спочатку відновити backend модуль
+2. Виконати terraform init
+3. Далі terraform apply
 
 ---
 
-## 🎯 Evaluation Criteria Mapping
+## 🎯 Відповідність критеріям оцінювання
 
-- Correct AWS architecture: ✅
-- Secure networking & IAM: ✅
+- Коректна AWS архітектура: ✅
+- Безпека (VPC, IAM, SG): ✅
 - EKS + RDS + ECR: ✅
-- CI/CD implemented: ✅
-- HPA configured: ✅
-- Cluster Autoscaler configured: ✅
-- Monitoring with persistence: ✅
-- GitOps via Argo CD: ✅
-- Documentation quality: ✅
-
+- Реалізований CI/CD: ✅
+- Налаштований HPA: ✅
+- Налаштований Cluster Autoscaler: ✅
+- Моніторинг з персистентністю: ✅
+- GitOps через Argo CD: ✅
+- Якісна документація: ✅
+^^^</pre>
